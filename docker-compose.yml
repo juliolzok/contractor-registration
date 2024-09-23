@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  contractor-registration:
+    build: .
+    container_name: strapi-app
+    ports:
+      - "1337:1337"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NODE_ENV: development
+    volumes:
+      - .:/app
+    networks:
+      - strapi-network
+
+  postgres:
+    image: postgres:15
+    container_name: strapi-postgres
+    environment:
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapi
+      POSTGRES_DB: strapi
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - strapi-network
+
+  redis:
+    image: redis:7
+    container_name: strapi-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - strapi-network
+
+volumes:
+  postgres_data:
+
+networks:
+  strapi-network:
+    driver: bridge
